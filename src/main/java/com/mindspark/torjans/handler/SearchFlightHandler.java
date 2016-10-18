@@ -28,16 +28,19 @@ public class SearchFlightHandler {
 		List<Map<String, String>> data = new ArrayList<>();
 		List<FlightSearchResponse> searchForFlights = 
 				fligthBookingService.searchForFlights(searchRequest);
-		for(FlightSearchResponse searchResponse : searchForFlights) {
-			Map<String, String> flightData = new HashMap<>();
-	    	flightData.put("flightNumber", searchResponse.getAirline() + searchResponse.getFlightNo());
-	    	flightData.put("deptTime", searchResponse.getDepartureDateTime());
-	    	flightData.put("arrivalTime", searchResponse.getArrivalDateTime());
-	    	flightData.put("cost", searchResponse.getCost());
-	    	data.add(flightData);
+		if (searchForFlights != null && !searchForFlights.isEmpty()) {
+			for (FlightSearchResponse searchResponse : searchForFlights) {
+				Map<String, String> flightData = new HashMap<>();
+				flightData.put("flightNumber", searchResponse.getAirline()
+						+ searchResponse.getFlightNo());
+				flightData.put("deptTime",
+						searchResponse.getDepartureDateTime());
+				flightData.put("arrivalTime",
+						searchResponse.getArrivalDateTime());
+				flightData.put("cost", searchResponse.getCost());
+				data.add(flightData);
+			}
 		}
-		
-		
 		return data;
 	}
 
