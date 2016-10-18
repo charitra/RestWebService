@@ -40,6 +40,7 @@ public class GreetingController {
     @RequestMapping(method = RequestMethod.POST, value = "/SearchFlight")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response SearchFlight(InputStream incomingData) throws JSONException{
+    	logger.info("Entering searchFlight method");
     	searchFlightHandler = new SearchFlightHandler();
     	bookFlightHandler = new BookFlightHandler();
     	List<Map<String, String>> searchFlightsData = new ArrayList<Map<String,String>>();
@@ -69,7 +70,7 @@ public class GreetingController {
 			BookFlightRequest bookFlightRequest = mapper.constructBookFlightRequest(params);
 			bookFlights = bookFlightHandler.bookFlights(bookFlightRequest);
 		}
-		
+		logger.info("Exiting searchFlight method");
         return new Response(template, bookFlights, searchFlightsData, new ArrayList<String>(), 
         		"ChatBotService");
     }

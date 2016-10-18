@@ -10,6 +10,8 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -21,19 +23,20 @@ import com.mindspark.torjans.dto.BookFlightRequest;
 import com.mindspark.torjans.dto.BookFlightResponse;
 import com.mindspark.torjans.dto.FlightSearchRequest;
 import com.mindspark.torjans.dto.FlightSearchResponse;
+import com.mindspark.torjans.handler.SearchFlightHandler;
 
 /**
  * @author M1026329
  *
  */
 public class FlightBookingServiceImpl implements FlightBookingService {
-
+	private static final Logger logger = LoggerFactory.getLogger(SearchFlightHandler.class);
 	/* (non-Javadoc)
 	 * @see com.mindspark.chatboot.FlightBookingService#searchForFlights(com.mindspark.chatboot.FlightSearchRequest)
 	 */
 	@Override
 	public List<FlightSearchResponse> searchForFlights(final FlightSearchRequest flightSearchRequest) {
-		// TODO Auto-generated method stub
+		logger.info("Inside FlightBookingServiceImpl :: searchForFlights");
 		List<FlightSearchResponse> flightSearchResponses = null;
 		String query = constructQuery(flightSearchRequest);
 		FlightBookingGateWay flightBookingGateWay = new FlightBookingGateWay();
@@ -100,10 +103,12 @@ public class FlightBookingServiceImpl implements FlightBookingService {
 			        flightSearchResponses.add(flightSearchResponse);
 			      }
 			} catch (Exception ex) {
+				logger.info("Exception in searchFlight");
 				ex.printStackTrace();
 			}
 			
 		}
+		logger.info("Exiting FlightBookingServiceImpl :: searchForFlights");
 		return flightSearchResponses;
 	}
 	

@@ -3,10 +3,15 @@
  */
 package com.mindspark.torjans.handler;
 
+import hello.GreetingController;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.mindspark.torjans.dto.FlightSearchRequest;
 import com.mindspark.torjans.dto.FlightSearchResponse;
@@ -21,10 +26,13 @@ public class SearchFlightHandler {
 	
 	private FlightBookingService fligthBookingService = new FlightBookingServiceImpl();
 	
+	private static final Logger logger = LoggerFactory.getLogger(SearchFlightHandler.class);
+	
 	public SearchFlightHandler() {
 	}
 
 	public List<Map<String, String>> searchFlights(FlightSearchRequest searchRequest) {
+		logger.info("Entering searchFlight Request construction");
 		List<Map<String, String>> data = new ArrayList<>();
 		List<FlightSearchResponse> searchForFlights = 
 				fligthBookingService.searchForFlights(searchRequest);
@@ -41,6 +49,7 @@ public class SearchFlightHandler {
 				data.add(flightData);
 			}
 		}
+		logger.info("Exiting searchFlight Request construction");
 		return data;
 	}
 
