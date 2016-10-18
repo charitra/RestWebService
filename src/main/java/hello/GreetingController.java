@@ -12,6 +12,8 @@ import javax.ws.rs.core.MediaType;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +29,8 @@ import com.mindspark.torjans.mapper.RequestMapper;
 public class GreetingController {
 
     private static final String template = "Welcome to ChatBot Service";
+    
+    private static final Logger logger = LoggerFactory.getLogger(GreetingController.class);
     
     private SearchFlightHandler searchFlightHandler;
     private BookFlightHandler bookFlightHandler;
@@ -78,6 +82,7 @@ public class GreetingController {
     
     @RequestMapping("/welcome")
     public Response welcome() {
+    	logger.info("Welcome to Flight Book Service");
         return new Response("Welcome to Flights booking", "Welcome to Flights booking"
         		,new ArrayList<Map<String,String>>(), new ArrayList<String>(), "ChatBotService");
     }
