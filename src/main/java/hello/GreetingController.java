@@ -58,7 +58,7 @@ public class GreetingController {
 		JSONObject object = (JSONObject)jsonObject.get("result");
 		String action = (String) object.get("action");
 		JSONObject params = (JSONObject) object.get("parameters");
-		String bookFlights = "";
+		String bookFlights = "Welcome to Flight Booking Service";
 		if ("SearchFlight".equalsIgnoreCase(action)) {
 			RequestMapper mapper = new RequestMapper();
 			FlightSearchRequest searchRequest = mapper
