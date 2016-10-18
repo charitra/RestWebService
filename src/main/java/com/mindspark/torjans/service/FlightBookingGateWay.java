@@ -20,7 +20,7 @@ import java.net.URL;
 public class FlightBookingGateWay {
 	public String airShopping(String airShoppingQuery) {
 		String response = null;
-	    String request = "https://mockappairline.herokuapp.com/AirShop/airbooking";
+	    String request = "http://mockairline.m3ptdp5x43.us-west-2.elasticbeanstalk.com/AirShop/airbooking";
 	    URL url = null;
 		HttpURLConnection urlConnection = null;
 		try {
