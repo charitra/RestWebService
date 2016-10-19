@@ -31,7 +31,7 @@ public class BookFlightHandler {
 		if(bookFlight != null) {
 			logger.info("Inside BookFlightHandler :: constructing response map");
 			bookResponseMap = new HashMap<String, String>();
-			bookResponseMap.put("flightNumber", bookFlight.getFlightNo());
+			bookResponseMap.put("flightNumber",bookFlight.getAirline() + bookFlight.getFlightNo());
 			bookResponseMap.put("deptTime", bookFlight.getDepartureDateTime());
 			bookResponseMap.put("arrivalTime", bookFlight.getArrivalDateTime());
 			bookResponseMap.put("cost", bookFlight.getCost());
