@@ -13,11 +13,16 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author M1026329
  *
  */
 public class FlightBookingGateWay {
+	private static final Logger logger = LoggerFactory.getLogger(FlightBookingServiceImpl.class);
+	
 	public String airShopping(String airShoppingQuery) {
 		String response = null;
 	    String request = "http://mockairline.m3ptdp5x43.us-west-2.elasticbeanstalk.com/AirBookingServlet";
@@ -43,6 +48,7 @@ public class FlightBookingGateWay {
 			InputStream in = new BufferedInputStream(
 					urlConnection.getInputStream());
 			response = getResponse(in);
+			logger.info("URL ::" + urlConnection.getURL().toString());
 			in.close();
 		} catch (Exception ex) {
 			ex.printStackTrace();

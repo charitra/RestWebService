@@ -39,8 +39,10 @@ public class FlightBookingServiceImpl implements FlightBookingService {
 	public List<FlightSearchResponse> searchForFlights(final FlightSearchRequest flightSearchRequest) {
 		List<FlightSearchResponse> flightSearchResponses = null;
 		String query = constructAirShoppingQuery(flightSearchRequest);
+		logger.info("sent request :" + query);
 		FlightBookingGateWay flightBookingGateWay = new FlightBookingGateWay();
 		String response = flightBookingGateWay.airShopping(query);
+		logger.info("received response :" + query);
 		if (response != null) {
 			try {
 				flightSearchResponses = new ArrayList<FlightSearchResponse>();
@@ -97,9 +99,11 @@ public class FlightBookingServiceImpl implements FlightBookingService {
 	@Override
 	public BookFlightResponse bookFlight(final BookFlightRequest bookFlightRequest) {
 		String query = constructOrderCreateQuery(bookFlightRequest);
+		logger.info("Sent request:");
 		logger.info(query);
 		FlightBookingGateWay flightBookingGateWay = new FlightBookingGateWay();
 		String response = flightBookingGateWay.airShopping(query);
+		logger.info("Received response:");
 		logger.info(response);
 		if (response != null) {
 			BookFlightResponse bookFlightResponse = new BookFlightResponse();
