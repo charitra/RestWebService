@@ -2,13 +2,21 @@ package com.mindspark.torjans.dto;
 
 public class BookFlightRequest {
 
+	private String airline;
 	private String flightNo;
 	private String DeptStation;
 	private String ArrivalStation;
 	private String DeptDate;
 	private String ArrDate;
 	private String paxSurname;
+	private int quantity;
 	
+	public int getQuantity() {
+		return quantity;
+	}
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
+	}
 	public String getFlightNo() {
 		return flightNo;
 	}
@@ -44,6 +52,12 @@ public class BookFlightRequest {
 	}
 	public void setPaxSurname(String paxSurname) {
 		this.paxSurname = paxSurname;
+	}
+	public String getAirline() {
+		return airline;
+	}
+	public void setAirline(String airline) {
+		this.airline = airline;
 	}
 	
 	

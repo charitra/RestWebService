@@ -23,22 +23,22 @@ import com.mindspark.torjans.dto.BookFlightRequest;
 import com.mindspark.torjans.dto.BookFlightResponse;
 import com.mindspark.torjans.dto.FlightSearchRequest;
 import com.mindspark.torjans.dto.FlightSearchResponse;
-import com.mindspark.torjans.handler.SearchFlightHandler;
 
 /**
  * @author M1026329
  *
  */
 public class FlightBookingServiceImpl implements FlightBookingService {
-	private static final Logger logger = LoggerFactory.getLogger(SearchFlightHandler.class);
+	
+	private static final Logger logger = LoggerFactory.getLogger(FlightBookingServiceImpl.class);
+
 	/* (non-Javadoc)
 	 * @see com.mindspark.chatboot.FlightBookingService#searchForFlights(com.mindspark.chatboot.FlightSearchRequest)
 	 */
 	@Override
 	public List<FlightSearchResponse> searchForFlights(final FlightSearchRequest flightSearchRequest) {
-		logger.info("Inside FlightBookingServiceImpl :: searchForFlights");
 		List<FlightSearchResponse> flightSearchResponses = null;
-		String query = constructQuery(flightSearchRequest);
+		String query = constructAirShoppingQuery(flightSearchRequest);
 		FlightBookingGateWay flightBookingGateWay = new FlightBookingGateWay();
 		String response = flightBookingGateWay.airShopping(query);
 		if (response != null) {
@@ -53,63 +53,91 @@ public class FlightBookingServiceImpl implements FlightBookingService {
 			    for (int i = 0; i < nodes.getLength(); i++) {
 			    	FlightSearchResponse flightSearchResponse = new FlightSearchResponse();
 			        Element airlineOffer = (Element) nodes.item(i);
-			        /*Element offerId = getChildElement(airlineOffer, "OfferID");
-			        System.out.println("OfferID: " + getCharacterDataFromElement(offerId));
-			        System.out.println("Owner: " + offerId.getAttribute("Owner"));
-			        flightSearchResponse.setAirline(offerId.getAttribute("Owner"));*/
 			        Element detailCurrencyPrice = getChildElement(airlineOffer, "DetailCurrencyPrice");
 			        Element total = getChildElement(detailCurrencyPrice, "Total");
-			        System.out.println("total: " + getCharacterDataFromElement(total));
-			        System.out.println("currencyCode: " + total.getAttribute("Code"));
 			        flightSearchResponse.setCost(total.getAttribute("Code") + getCharacterDataFromElement(total));
 			        Element applicableFlight = getChildElement(airlineOffer, "ApplicableFlight");
 			        Element originDestinationReferences = getChildElement(applicableFlight, "OriginDestinationReferences");
-			        System.out.println("OriginDestinationReferences: " + getCharacterDataFromElement(originDestinationReferences));
 			        String originDestinationReference = getCharacterDataFromElement(originDestinationReferences);
 			        Element originDestination = getElement(doc, "OriginDestination", "OriginDestinationKey", originDestinationReference);
 			        if (originDestination != null) {
 			        	Element departureCode = getChildElement(originDestination, "DepartureCode");
-			        	System.out.println("DepartureCode: " + getCharacterDataFromElement(departureCode));
 			        	flightSearchResponse.setFromStation(getCharacterDataFromElement(departureCode));
 			        	Element arrivalCode = getChildElement(originDestination, "ArrivalCode");
-			        	System.out.println("ArrivalCode: " + getCharacterDataFromElement(arrivalCode));
 			        	flightSearchResponse.setToStation(getCharacterDataFromElement(arrivalCode));
 			        }
 			        Element flightSegmentReferences = getChildElement(applicableFlight, "FlightSegmentReference");
-			        System.out.println("FlightSegmentReference: " + flightSegmentReferences.getAttribute("ref"));
 			        String flightSegmentReference = flightSegmentReferences.getAttribute("ref");
 			        Element flightSegment = getElement(doc, "FlightSegment", "SegmentKey", flightSegmentReference);
 			        if (flightSegment != null) {
 			        	String departureDateTime = getDateTime(flightSegment, "Departure");
-			        	System.out.println("DepartureDateTime: " + departureDateTime);
 			        	flightSearchResponse.setDepartureDateTime(departureDateTime);
 			        	String arrivalDateTime = getDateTime(flightSegment, "Arrival");
-			        	System.out.println("ArrivalDateTime: " + arrivalDateTime);
 			        	flightSearchResponse.setArrivalDateTime(arrivalDateTime);
 			        	Element marketingCarrier = getChildElement(flightSegment, "MarketingCarrier");
 			        	Element airline = getChildElement(marketingCarrier, "AirlineID");
-			        	System.out.println("Airline: " + getCharacterDataFromElement(airline));
 			        	flightSearchResponse.setAirline(getCharacterDataFromElement(airline));
 			        	Element flightNumber = getChildElement(marketingCarrier, "FlightNumber");
-			        	System.out.println("FlightNumber: " + getCharacterDataFromElement(flightNumber));
 			        	flightSearchResponse.setFlightNo(getCharacterDataFromElement(flightNumber));
 			        }
 			        Element cabinDesignator = getChildElement(applicableFlight, "CabinDesignator");
-			        System.out.println("CabinDesignator: " + getCharacterDataFromElement(cabinDesignator));
 		        	flightSearchResponse.setCabin(getCharacterDataFromElement(cabinDesignator));
 			        Element ptc = getChildElement(doc, "PTC");
-			        System.out.println("Quantity: " + ptc.getAttribute("Quantity"));
 			        flightSearchResponse.setQuantity(Integer.parseInt(ptc.getAttribute("Quantity")));
 			        flightSearchResponses.add(flightSearchResponse);
 			      }
 			} catch (Exception ex) {
-				logger.info("Exception in searchFlight");
 				ex.printStackTrace();
 			}
 			
 		}
-		logger.info("Exiting FlightBookingServiceImpl :: searchForFlights");
 		return flightSearchResponses;
+	}
+	
+	@Override
+	public BookFlightResponse bookFlight(final BookFlightRequest bookFlightRequest) {
+		String query = constructOrderCreateQuery(bookFlightRequest);
+		logger.info(query);
+		FlightBookingGateWay flightBookingGateWay = new FlightBookingGateWay();
+		String response = flightBookingGateWay.airShopping(query);
+		logger.info(response);
+		if (response != null) {
+			BookFlightResponse bookFlightResponse = new BookFlightResponse();
+			try {
+				DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			    InputSource is = new InputSource();
+			    is.setCharacterStream(new StringReader(response));
+			    Document doc = db.parse(is);
+			    Element ptc = getChildElement(doc, "PTC");
+			    bookFlightResponse.setQuantity(Integer.parseInt(ptc.getAttribute("Quantity")));
+			    Element surname = getChildElement(doc, "Surname");
+			    bookFlightResponse.setPaxSurname(getCharacterDataFromElement(surname));
+			    Element bookingReference = getChildElement(doc, "BookingReference");
+			    Element bookingReferenceId = getChildElement(bookingReference, "ID");
+			    bookFlightResponse.setBookingReference(getCharacterDataFromElement(bookingReferenceId));
+			    Element total = getChildElement(doc, "Total");
+			    bookFlightResponse.setCost(total.getAttribute("Code") + getCharacterDataFromElement(total));
+			    Element flightSegment = getChildElement(doc, "FlightSegment");
+			    String deptStation = getStation(flightSegment, "Departure");
+			    bookFlightResponse.setDeptStation(deptStation);
+			    String arrivalStation = getStation(flightSegment, "Arrival");
+			    bookFlightResponse.setArrivalStation(arrivalStation);
+			    String departureDateTime = getDateTime(flightSegment, "Departure");
+			    bookFlightResponse.setDepartureDateTime(departureDateTime);
+			    String arrivalDateTime = getDateTime(flightSegment, "Arrival");
+			    bookFlightResponse.setArrivalDateTime(arrivalDateTime);
+			    Element marketingCarrier = getChildElement(flightSegment, "MarketingCarrier");
+			    Element airline = getChildElement(marketingCarrier, "AirlineID");
+			    bookFlightResponse.setAirline(getCharacterDataFromElement(airline));
+			    Element flightNumber = getChildElement(marketingCarrier, "FlightNumber");
+			    bookFlightResponse.setFlightNo(getCharacterDataFromElement(flightNumber));
+			} catch (Exception ex) {
+				logger.info("Exception in calling book flight service");
+				ex.printStackTrace();
+			}
+			return bookFlightResponse;
+		}
+		return null;
 	}
 	
 	private String getDateTime(Element flightSegment, String key) {
@@ -118,6 +146,12 @@ public class FlightBookingServiceImpl implements FlightBookingService {
 		Element time = getChildElement(departure, "Time");
 		String dateTime = getCharacterDataFromElement(date) + getCharacterDataFromElement(time);
 		return dateTime;
+	}
+	
+	private String getStation(Element flightSegment, String key) {
+		Element departure = getChildElement(flightSegment, key);
+		Element airport = getChildElement(departure, "AirportCode");
+		return getCharacterDataFromElement(airport);
 	}
 
 	private Element getChildElement(Element element, String tagName) {
@@ -153,7 +187,7 @@ public class FlightBookingServiceImpl implements FlightBookingService {
 	    return "";
 	}
 
-	private String constructQuery(final FlightSearchRequest flightSearchRequest) {
+	private String constructAirShoppingQuery(final FlightSearchRequest flightSearchRequest) {
 		String query = "<AirShoppingRQ xmlns=\"http://www.iata.org/IATA/EDIST\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.iata.org/IATA/EDIST AirShoppingRQ.xsd\""
 				+ " EchoToken=\"8fdb1c621a7a4454aa3360556e7784d5\" TimeStamp=\"2016-18-12T12:39:00Z\" Version=\"15.2\" Target=\"Test\" PrimaryLangID=\"en\" AltLangID=\"en\" RetransmissionIndicator=\"false\""
 				+ " AsynchronousAllowedInd=\"false\" TransactionIdentifier=\"a\" SequenceNmbr=\"201\"><PointOfSale><Location><CountryCode>IN</CountryCode><CityCode>DEL</CityCode></Location>"
@@ -184,11 +218,27 @@ public class FlightBookingServiceImpl implements FlightBookingService {
 		}
 		return query;
 	}
-
-	@Override
-	public BookFlightResponse bookFlight(BookFlightRequest bookFlightRequest) {
-		// TODO Auto-generated method stub
-		return null;
+	
+	private String constructOrderCreateQuery(final BookFlightRequest bookFlightRequest) {
+		String query = "<OrderCreateRQ xmlns=\"http://www.iata.org/IATA/EDIST\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" Version=\"15.2\" xsi:schemaLocation=\"http://www.iata.org/IATA/EDIST OrderCreateRQ.xsd\">"
+				+ "<PointOfSale><Location><CountryCode>IN</CountryCode><CityCode>DEL</CityCode></Location>"
+				+ "<RequestTime Zone=\"EST\">2016-10-18T07:38:00</RequestTime><TouchPoint><Device><Code>2</Code><Definition>Web Browser</Definition><Position><Latitude>38.89756</Latitude>"
+				+ "<Longitude>-77.03650</Longitude><NAC>8KD7V PGGM0</NAC></Position></Device><Event><Code>9</Code><Definition>Shop</Definition></Event></TouchPoint></PointOfSale><Document>"
+				+ "<Name>KRONOS NDC GATEWAY</Name><ReferenceVersion>1.0</ReferenceVersion></Document><Party><Sender><TravelAgencySender><Contacts><Contact><EmailContact><Address>book@trozentravel.com</Address>"
+				+ "</EmailContact></Contact></Contacts><PseudoCity>A4A</PseudoCity><IATA_Number>98417900</IATA_Number><AgencyID Owner=\"TT\">TT</AgencyID><AgentUser><Name>ksmith</Name><AgentUserID>ksmith212</AgentUserID>"
+				+ "<UserRole>Admin</UserRole></AgentUser></TravelAgencySender></Sender></Party><Query><Passengers><Passenger ObjectKey=\"PAX1\"><PTC Quantity=\"" + bookFlightRequest.getQuantity() +"\">ADT</PTC><Name><Surname>"
+				+ bookFlightRequest.getPaxSurname() + "</Surname></Name></Passenger></Passengers><OrderItems><ShoppingResponse><Owner>" + bookFlightRequest.getAirline()
+				+ "</Owner><ResponseID>RE211db390f52c453b982d0889f7e71551</ResponseID><Offers><Offer><OfferID Owner=\"" + bookFlightRequest.getAirline() + "\">1</OfferID><OfferItems><OfferItem><OfferItemID Owner=\""
+				+ bookFlightRequest.getAirline() +"\">1#M#110013557#210013557</OfferItemID><Passengers><PassengerReference>PAX1</PassengerReference></Passengers></OfferItem></OfferItems></Offer></Offers></ShoppingResponse></OrderItems>"
+				+ "<DataLists><FlightSegmentList><FlightSegment SegmentKey=\"SEG1\"><Departure><AirportCode>" + bookFlightRequest.getDeptStation() + "</AirportCode><Date>" + bookFlightRequest.getDeptDate() +"</Date>"
+			    + "<Time>00:00:00</Time></Departure><Arrival><AirportCode>" + bookFlightRequest.getArrivalStation() + "</AirportCode><Date>"
+			    + bookFlightRequest.getArrDate() + "</Date><Time>00:00:00</Time></Arrival><MarketingCarrier><AirlineID>" + bookFlightRequest.getAirline()
+			    + "</AirlineID><FlightNumber>" + bookFlightRequest.getFlightNo() + "</FlightNumber></MarketingCarrier><OperatingCarrier><AirlineID>" + bookFlightRequest.getAirline()
+			    + "</AirlineID><FlightNumber>" + bookFlightRequest.getFlightNo() + "</FlightNumber></OperatingCarrier></FlightSegment></FlightSegmentList><FlightList><Flight FlightKey=\"FL1\"><SegmentReferences>SEG1"
+			    + "</SegmentReferences></Flight></FlightList><OriginDestinationList><OriginDestination OriginDestinationKey=\"OD1\"><DepartureCode>" + bookFlightRequest.getDeptStation()
+			    + "</DepartureCode><ArrivalCode>BLR</ArrivalCode><FlightReferences>FL1</FlightReferences></OriginDestination></OriginDestinationList></DataLists></Query></OrderCreateRQ>";
+		return query;
+		
 	}
 	
 }
