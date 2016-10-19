@@ -40,7 +40,7 @@ public class RequestMapper {
 		return searchRequest;
 	}
 
-	public BookFlightRequest constructBookFlightRequest(JSONObject params, JSONObject contextparams) {
+	public BookFlightRequest constructBookFlightRequest(JSONObject params, JSONObject contextparams) throws Exception {
 		logger.info("Inside constructBookFlightRequest() method");
 		BookFlightRequest flightRequest = new BookFlightRequest();
 		
@@ -65,7 +65,7 @@ public class RequestMapper {
 			
 		} catch (JSONException e) {
 			logger.info("Exception in constructBookFlightRequest() method");
-			e.printStackTrace();
+			throw new Exception("Sorry! I coudldn't understand");
 		}
 		logger.info("Exiting constructBookFlightRequest() method");
 		return flightRequest;

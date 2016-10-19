@@ -74,13 +74,17 @@ public class FlightServiceController {
 			RequestMapper mapper = new RequestMapper();
 			JSONArray contexts = (JSONArray) object.get("contexts");
 			JSONObject contextparams = (JSONObject) contexts.getJSONObject(0).get("parameters");
-			BookFlightRequest bookFlightRequest = mapper.constructBookFlightRequest(params, contextparams);
-			Map<String, String> bookFlightsResp = bookFlightHandler.bookFlights(bookFlightRequest);
-			if(bookFlightsResp == null) {
-				bookFlights = "Sorry! We are facing some issue while booking your ticket. "
-						+ "Please try after some time";
+			try {
+				BookFlightRequest bookFlightRequest = mapper.constructBookFlightRequest(params, contextparams);
+				Map<String, String> bookFlightsResp = bookFlightHandler.bookFlights(bookFlightRequest);
+				if(bookFlightsResp == null) {
+					bookFlights = "Sorry! We are facing some issue while booking your ticket. "
+							+ "Please try after some time";
+				}
+				searchFlightsData.add(bookFlightsResp);
+			} catch (Exception e) {
+				bookFlights = e.getMessage();
 			}
-			searchFlightsData.add(bookFlightsResp);
 		}
 		logger.info("Exiting searchFlight method");
         return new Response(template, bookFlights, searchFlightsData, new ArrayList<String>(), 
