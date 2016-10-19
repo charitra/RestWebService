@@ -87,7 +87,7 @@ public class FlightServiceController {
 			}
 		}
 		logger.info("Exiting searchFlight method");
-        return new Response(template, bookFlights, searchFlightsData, new ArrayList<String>(), 
+        return new Response(bookFlights, bookFlights, searchFlightsData, new ArrayList<String>(), 
         		"ChatBotService");
     }
     
